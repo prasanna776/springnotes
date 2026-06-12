@@ -1,6 +1,6 @@
 # Spring Framework - First Hello World Project
 
-<img src="hellospring.png"
+<img src="images/hellospring.png"
      alt="Spring Hello World Project"
      width="500"
      height="450">
