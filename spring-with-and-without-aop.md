@@ -232,12 +232,12 @@ Logging code is repeated everywhere.
 ---
 
 # Project Structure
-
-```text
 <img src="images/springaop.png"
      alt="Spring Hello World Project"
      width="500"
      height="450">
+```text
+
 SpringAOP
 │
 ├── src
