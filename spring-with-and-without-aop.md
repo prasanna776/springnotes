@@ -1,163 +1,290 @@
-# Spring AOP - With and Without AOP Example
-
-## Introduction
-
-AOP (Aspect-Oriented Programming) helps separate cross-cutting concerns such as logging, security, auditing, and transaction management from business logic.
-
-To understand why AOP is useful, let's compare a Login System implemented:
-
-1. Without AOP
-2. With AOP
+# Spring AOP (Aspect-Oriented Programming)
 
 ---
 
-# Scenario
+# 1. Introduction
 
-Suppose we want to log every login operation.
+In software development, some functionalities are required in many places throughout an application.
 
-Before login:
+Examples:
+
+- Logging
+- Security
+- Transaction Management
+- Exception Handling
+- Performance Monitoring
+
+These functionalities are called **Cross-Cutting Concerns** because they affect multiple modules of an application.
+
+Without AOP, developers write the same code repeatedly inside different methods.
+
+Spring AOP solves this problem by separating cross-cutting concerns from business logic.
+
+---
+
+# Real-Time Example
+
+Consider a College Management System.
+
+Whenever a student performs an action:
 
 ```text
-User is attempting to login...
+Login
+   ↓
+Perform Operation
+   ↓
+Logout
 ```
 
-After login:
+Examples:
+
+- View Result
+- View Attendance
+- View Fee Details
+
+The Login and Logout operations are common for every method.
+
+Instead of writing them repeatedly, AOP allows us to write them once and apply them automatically.
+
+---
+
+# PART 1 : WITHOUT AOP
+
+---
+
+# Project Structure
 
 ```text
-Login completed.
+WithoutAOP
+│
+└── src
+    └── com.spring.aop
+        ├── Student.java
+        └── Main.java
 ```
 
 ---
 
-# Without AOP
-
-In a normal Java application, logging code is written directly inside business methods.
-
-## LoginService.java
+# Student.java
 
 ```java
-package com.spring.withoutaop;
+package com.spring.aop;
 
-public class LoginService {
+public class Student {
 
-    public void login(String username) {
+    public void result() {
 
         // Logging Code
-        System.out.println("User is attempting to login...");
+        System.out.println("Login Attempting");
 
         // Business Logic
-        System.out.println(username + " logged in successfully.");
+        System.out.println("Viewing Result");
 
         // Logging Code
-        System.out.println("Login completed.");
+        System.out.println("Exit");
+    }
+
+    public void attendance() {
+
+        // Logging Code
+        System.out.println("Login Attempting");
+
+        // Business Logic
+        System.out.println("Viewing Attendance");
+
+        // Logging Code
+        System.out.println("Exit");
+    }
+
+    public void feeDetails() {
+
+        // Logging Code
+        System.out.println("Login Attempting");
+
+        // Business Logic
+        System.out.println("Viewing Fee Details");
+
+        // Logging Code
+        System.out.println("Exit");
     }
 }
 ```
 
 ---
 
-## Main.java
+# Main.java
 
 ```java
-package com.spring.withoutaop;
+package com.spring.aop;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        LoginService service = new LoginService();
+        Student s = new Student();
 
-        service.login("Prasanna");
+        s.result();
+
+        System.out.println();
+
+        s.attendance();
+
+        System.out.println();
+
+        s.feeDetails();
     }
 }
 ```
 
 ---
 
-## Output
+# Output
 
 ```text
-User is attempting to login...
+Login Attempting
+Viewing Result
+Exit
 
-Prasanna logged in successfully.
+Login Attempting
+Viewing Attendance
+Exit
 
-Login completed.
+Login Attempting
+Viewing Fee Details
+Exit
 ```
 
 ---
 
 # Problems Without AOP
 
-Suppose there are many methods:
+## Code Duplication
+
+The following code is repeated in every method:
 
 ```java
-login()
-logout()
-register()
-changePassword()
-forgotPassword()
+System.out.println("Login Attempting");
+System.out.println("Exit");
 ```
-
-We must write:
-
-```java
-System.out.println("Logging...");
-```
-
-inside every method.
-
-Example:
-
-```java
-public void login() {
-    System.out.println("Logging...");
-}
-
-public void logout() {
-    System.out.println("Logging...");
-}
-
-public void register() {
-    System.out.println("Logging...");
-}
-```
-
-### Issues
-
-* Code Duplication
-* Difficult Maintenance
-* Business Logic mixed with Logging Logic
-* Poor Separation of Concerns
 
 ---
 
-# With Spring AOP
+## Difficult Maintenance
 
-Using AOP, logging code is moved into a separate Aspect class.
+If logging changes:
 
-Business class contains only business logic.
+```java
+Login Attempting
+```
+
+to
+
+```java
+User Logged In Successfully
+```
+
+all methods must be modified.
 
 ---
 
-# LoginService.java
+## Poor Readability
+
+Business logic and logging code are mixed together.
+
+```java
+public void result() {
+
+    System.out.println("Login Attempting");
+
+    System.out.println("Viewing Result");
+
+    System.out.println("Exit");
+}
+```
+
+---
+
+# Visualization
+
+```text
+result()
+ ├─ Login
+ ├─ Business Logic
+ └─ Exit
+
+attendance()
+ ├─ Login
+ ├─ Business Logic
+ └─ Exit
+
+feeDetails()
+ ├─ Login
+ ├─ Business Logic
+ └─ Exit
+```
+
+Logging code is repeated everywhere.
+
+---
+
+# PART 2 : WITH AOP
+
+---
+
+# Project Structure
+
+```text
+<img src="images/springaop.png"
+     alt="Spring Hello World Project"
+     width="500"
+     height="450">
+SpringAOP
+│
+├── src
+│   └── com.spring.aop
+│       ├── Student.java
+│       ├── LoggingAspect.java
+│       └── Main.java
+│
+├── ApplicationContext.xml
+│
+└── JAR Files
+    ├── spring-aop-5.3.39.jar
+    ├── spring-beans-5.3.39.jar
+    ├── spring-context-5.3.39.jar
+    ├── spring-core-5.3.39.jar
+    ├── spring-expression-5.3.39.jar
+    ├── spring-jcl-5.3.39.jar
+    ├── commons-logging-1.2.jar
+    ├── aspectjrt-1.9.25.jar
+    └── aspectjweaver-1.9.25.1.jar
+```
+
+---
+
+# Student.java
 
 ```java
 package com.spring.aop;
 
-public class LoginService {
+public class Student {
 
-    public void login(String username) {
+    public void result() {
 
-        System.out.println(username + " logged in successfully.");
+        System.out.println("Viewing Result");
+    }
+
+    public void attendance() {
+
+        System.out.println("Viewing Attendance");
+    }
+
+    public void feeDetails() {
+
+        System.out.println("Viewing Fee Details");
     }
 }
 ```
-
-Notice:
-
-No logging code is present.
-
-Only business logic exists.
 
 ---
 
@@ -166,7 +293,6 @@ Only business logic exists.
 ```java
 package com.spring.aop;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -174,24 +300,16 @@ import org.aspectj.lang.annotation.Before;
 @Aspect
 public class LoggingAspect {
 
-    @Before("execution(* com.spring.aop.LoginService.*(..))")
-    public void beforeLogin(JoinPoint jp) {
+    @Before("execution(* com.spring.aop.Student.*(..))")
+    public void beforeMethod() {
 
-        System.out.println("=== Before Advice ===");
-        System.out.println("Method Name: " +
-                jp.getSignature().getName());
-
-        System.out.println("User is attempting to login...");
+        System.out.println("Login Attempting");
     }
 
-    @After("execution(* com.spring.aop.LoginService.*(..))")
-    public void afterLogin(JoinPoint jp) {
+    @After("execution(* com.spring.aop.Student.*(..))")
+    public void afterMethod() {
 
-        System.out.println("=== After Advice ===");
-        System.out.println("Method Name: " +
-                jp.getSignature().getName());
-
-        System.out.println("Login completed.");
+        System.out.println("Exit");
     }
 }
 ```
@@ -213,13 +331,13 @@ public class LoggingAspect {
        http://www.springframework.org/schema/aop
        https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <bean id="loginService"
-          class="com.spring.aop.LoginService"/>
+    <aop:aspectj-autoproxy/>
+
+    <bean id="s"
+          class="com.spring.aop.Student"/>
 
     <bean id="loggingAspect"
           class="com.spring.aop.LoggingAspect"/>
-
-    <aop:aspectj-autoproxy/>
 
 </beans>
 ```
@@ -239,13 +357,19 @@ public class Main {
     public static void main(String[] args) {
 
         ApplicationContext context =
-                new ClassPathXmlApplicationContext(
-                        "ApplicationContext.xml");
+                new ClassPathXmlApplicationContext("ApplicationContext.xml");
 
-        LoginService service =
-                (LoginService) context.getBean("loginService");
+        Student s = (Student) context.getBean("s");
 
-        service.login("Prasanna");
+        s.result();
+
+        System.out.println();
+
+        s.attendance();
+
+        System.out.println();
+
+        s.feeDetails();
     }
 }
 ```
@@ -255,124 +379,199 @@ public class Main {
 # Output
 
 ```text
-=== Before Advice ===
-Method Name: login
-User is attempting to login...
+Login Attempting
+Viewing Result
+Exit
 
-Prasanna logged in successfully.
+Login Attempting
+Viewing Attendance
+Exit
 
-=== After Advice ===
-Method Name: login
-Login completed.
+Login Attempting
+Viewing Fee Details
+Exit
 ```
 
 ---
 
-# Execution Flow Without AOP
+# How AOP Works Internally
 
-```text
-Client
-   |
-   v
-login()
-   |
-   +--> Logging
-   |
-   +--> Business Logic
-   |
-   +--> Logging
+When:
+
+```java
+s.result();
 ```
 
-Everything is inside the same method.
+is called,
+
+Spring internally performs:
+
+```text
+Before Advice
+      ↓
+result()
+      ↓
+After Advice
+```
+
+Actual Flow:
+
+```text
+Login Attempting
+      ↓
+Viewing Result
+      ↓
+Exit
+```
 
 ---
 
-# Execution Flow With AOP
+# AOP Terminology
+
+## Aspect
+
+```java
+@Aspect
+public class LoggingAspect
+```
+
+Contains common functionality.
+
+---
+
+## Advice
+
+```java
+@Before
+@After
+```
+
+Action executed before or after a method.
+
+---
+
+## Join Point
+
+```java
+result()
+attendance()
+feeDetails()
+```
+
+Methods where advice can be applied.
+
+---
+
+## Pointcut
+
+```java
+execution(* com.spring.aop.Student.*(..))
+```
+
+Selects all methods of Student class.
+
+---
+
+## Target Object
+
+```java
+Student
+```
+
+Actual business object.
+
+---
+
+## Proxy Object
 
 ```text
 Client
-   |
-   v
-Spring Proxy
-   |
-   +--> @Before Advice
-   |
-   +--> login()
-   |
-   +--> @After Advice
+   ↓
+Proxy
+   ↓
+Student
 ```
 
-Spring automatically injects logging behavior.
+Spring creates the proxy automatically.
 
 ---
 
 # Comparison
 
-| Without AOP                       | With AOP                  |
-| --------------------------------- | ------------------------- |
-| Logging code inside every method  | Logging code written once |
-| Code duplication                  | Reusable                  |
-| Difficult maintenance             | Easy maintenance          |
-| Business logic mixed with logging | Clean separation          |
-| Hard to manage large applications | Easy to manage            |
+| Without AOP | With AOP |
+|------------|----------|
+| Logging code repeated in every method | Logging written once |
+| High code duplication | No duplication |
+| Difficult maintenance | Easy maintenance |
+| Business logic mixed with logging | Clean separation |
+| Less reusable | Highly reusable |
+| More coding effort | Less coding effort |
 
 ---
 
-# Real-World Example
+# Advantages of AOP
 
-Imagine a Bank Application.
+### 1. Reduces Code Duplication
 
-Methods:
-
-```java
-deposit()
-withdraw()
-transfer()
-checkBalance()
-```
-
-Without AOP:
-
-```java
-Logging
-Security Check
-Transaction Code
-```
-
-must be written in every method.
-
-With AOP:
-
-```java
-SecurityAspect
-LoggingAspect
-TransactionAspect
-```
-
-handle these concerns automatically.
-
-Business methods remain clean and focused only on business operations.
+Logging code is written once.
 
 ---
 
-# Conclusion
+### 2. Improves Readability
 
-Without AOP:
+Business classes contain only business logic.
 
-```text
-Business Logic + Logging + Security + Auditing
+```java
+public void result() {
+    System.out.println("Viewing Result");
+}
 ```
 
-are mixed together.
+---
 
-With AOP:
+### 3. Easy Maintenance
 
-```text
-Business Logic
-       +
-Aspect Classes
+Changes are made in one aspect class.
+
+---
+
+### 4. Better Reusability
+
+One aspect can work with many classes.
+
+---
+
+### 5. Separation of Concerns
+
+Business Logic:
+
+```java
+Student.java
 ```
 
-are separated.
+Cross-Cutting Concern:
 
-This makes enterprise applications cleaner, reusable, maintainable, and easier to develop.
+```java
+LoggingAspect.java
+```
+
+---
+
+### 6. Professional Enterprise Development
+
+Used extensively in:
+
+- Spring Security
+- Transaction Management
+- Logging Frameworks
+- Monitoring Systems
+
+---
+
+# Interview Definition
+
+**Spring AOP (Aspect-Oriented Programming)** is a technique used to separate cross-cutting concerns such as logging, security, transaction management, and exception handling from the main business logic. It applies these concerns automatically using Aspects, Advice, Pointcuts, and Proxy Objects.
+
+## One-Line Answer
+
+Spring AOP allows developers to write common functionalities once and automatically apply them to multiple methods without modifying the business logic.
